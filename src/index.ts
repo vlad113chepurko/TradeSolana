@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
 
-import { sendSol, getBalance } from "./solana";
+import { sendSol } from "./solana";
 
 dotenv.config();
 
@@ -14,8 +14,6 @@ const prisma = new PrismaClient();
 app.post("/buy", async (req, res) => {
   try {
     const { user_id, amount, price, token } = req.body;
-
-    getBalance(process.env.PUBLIC_KEY || "");
 
     if (!user_id || !amount || !price || !token) {
       return res.status(400).json({ error: "Missing required fields" });
@@ -71,29 +69,37 @@ app.post("/sell", async (req, res) => {
   }
 });
 
-app.get("/pnl", async (req, res) => {
+app.get("/pnl/:user_id", async (req, res) => {
   try {
-    const { user_id } = req.query as { user_id?: string };
+    const { user_id } = req.params;
     if (!user_id) {
       return res.status(400).json({ error: "Missing user_id parameter" });
     }
     const trades = await prisma.trade.findMany({
-      where: { user_id: "123456" },
+      where: { user_id: user_id },
     });
 
-    let totalBuy = 0;
-    let totalSell = 0;
+    const tokensMap: Record<string, { buy: number; sell: number }> = {};
 
     trades.forEach((trade) => {
+      const token = trade.token;
+      if (!tokensMap[token]) tokensMap[token] = { buy: 0, sell: 0 };
+
       if (trade.side === "buy") {
-        totalBuy += trade.amount * trade.price;
+        tokensMap[token].buy += trade.amount * trade.price;
       } else if (trade.side === "sell") {
-        totalSell += trade.amount * trade.price;
+        tokensMap[token].sell += trade.amount * trade.price;
       }
     });
 
-    const pnl = totalSell - totalBuy;
-    res.status(200).json({ message: "PnL retrieved successfully", pnl });
+    const tokens = Object.entries(tokensMap).map(([token, { buy, sell }]) => ({
+      token,
+      pnl: sell - buy,
+    }));
+
+    const total_pnl = tokens.reduce((acc, t) => acc + t.pnl, 0);
+
+    res.status(200).json({ user_id, tokens, total_pnl });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to retrieve PnL" });

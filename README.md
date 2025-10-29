@@ -23,9 +23,8 @@ npm run dev
 
 # 🔗 Endpoints
 
-| Method   | Endpoint              | Description                              |
-| :------- | :-------------------- | :--------------------------------------- |
-| **POST** | `/buy`                | Create a buy trade                       |
-| **POST** | `/sell`               | Create a sell trade                      |
-| **GET**  | `/pnl?user_id=123456` | Get total PnL (Profit and Loss) for user |
-
+| Method   | Endpoint        | Description            |
+| :------- | :-------------- | :--------------------- |
+| **POST** | `/buy`          | Create a buy trade     |
+| **POST** | `/sell`         | Create a sell trade    |
+| **GET**  | `/pnl/:user_id` | Get total PnL for user |

@@ -39,6 +39,7 @@ export async function sendSol(to: string, amountSol: number) {
   }
 }
 
+// for log
 export async function getBalance(publicKey: string) {
   const balance = await connection.getBalance(new PublicKey(publicKey));
   console.log(`Balance for ${publicKey}: ${balance / LAMPORTS_PER_SOL} SOL`);

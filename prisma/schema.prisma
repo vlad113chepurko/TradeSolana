@@ -7,11 +7,16 @@ datasource db {
   url = env("MONGO_URL")
 }
 
+enum TradeSide {
+  buy
+  sell
+}
+
 model Trade {
   id String   @id @default(auto()) @map("_id") @db.ObjectId
   user_id String
-  side String
-  token String?
+  side TradeSide
+  token String
   amount Float
   price Float
   tx_hash String
