@@ -28,3 +28,4 @@ npm run dev
 | **POST** | `/buy`          | Create a buy trade     |
 | **POST** | `/sell`         | Create a sell trade    |
 | **GET**  | `/pnl/:user_id` | Get total PnL for user |
+| **POST** | `/connectWallet`| Get PublicKey          |

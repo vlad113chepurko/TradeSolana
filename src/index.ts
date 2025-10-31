@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
 
 import { sendSol } from "./solana";
+import { PublicKey } from "@solana/web3.js";
 
 dotenv.config();
 
@@ -103,6 +104,27 @@ app.get("/pnl/:user_id", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to retrieve PnL" });
+  }
+});
+
+app.post("/connectWallet", (req, res) => {
+  try {
+    const { publicKey } = req.body;
+    if (!publicKey) {
+      return res
+        .status(400)
+        .json({ error: "Missing publicKey in request body" });
+    }
+    try {
+      new PublicKey(publicKey);
+      res.status(200).json({ message: "Wallet connected successfully" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to connect wallet" });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to connect wallet" });
   }
 });
 
